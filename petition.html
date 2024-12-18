@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign the Petition</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+        }
+
+        header {
+            background-color: #005f73;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #0a9396;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        section {
+            padding: 20px;
+        }
+
+        form input, button {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #e9d8a6;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #ee9b00;
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #ca6702;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sign the Petition</h1>
+        <p>Join us to protect our oceans and promote sustainable solutions.</p>
+    </header>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="petition.html">Petition</a>
+    </nav>
+
+    <section>
+        <h2>Sign the Petition</h2>
+        <form id="petitionForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Your Name" required>
+
+            <label for="nationality">Nationality:</label>
+            <input type="text" id="nationality" placeholder="Your Nationality" required>
+
+            <label for="age">Age:</label>
+            <input type="number" id="age" placeholder="Your Age" required>
+
+            <button type="submit">Sign Petition</button>
+        </form>
+
+        <h3>Supporters List:</h3>
+        <ul id="petitionList">
+            <!-- Dynamically loaded supporters will appear here -->
+        </ul>
+    </section>
+
+    <script>
+        const apiURL = "https://script.google.com/macros/s/AKfycbw2g4BWr3PwBc3RKOnkQNnUcP_OeliZytS8pWsnPfxR2LY9_Ee3lOGlXoLQ7EZrOUcB/exec"; // Replace with your Apps Script URL
+
+        // Handle form submission
+        document.getElementById("petitionForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const nationality = document.getElementById("nationality").value;
+            const age = document.getElementById("age").value;
+
+            // Send form data to Google Sheets via POST
+            fetch(apiURL, {
+                method: "POST",
+                body: JSON.stringify({ name, nationality, age }),
+            })
+            .then(response => response.text())
+            .then(() => {
+                alert("Thank you for signing!");
+                loadPetitionData(); // Reload supporter list
+                document.getElementById("petitionForm").reset();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to sign the petition. Try again.");
+            });
+        });
+
+        // Fetch petition data and display it in the list
+        function loadPetitionData() {
+            fetch(apiURL)
+                .then(response => response.json())
+                .then(data => {
+                    const petitionList = document.getElementById("petitionList");
+                    petitionList.innerHTML = ""; // Clear existing list
+
+                    // Iterate over the data and create list items
+                    data.slice(1).forEach(row => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = `${row[0]} (${row[1]}, Age: ${row[2]})`;
+                        petitionList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        }
+
+        // Load supporter data on page load
+        loadPetitionData();
+    </script>
+    <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSWM0SbiX5AffYO21zCS6fhwee5ufYealhQ7gSkYB2Fnl08samjldj3QXDLOhDRQjb7hYb9gKlSC4Ny/pubhtml?widget=true&amp;headers=false" 
+            width="50%" 
+            height="600px" 
+            style="border: none;">
+    </iframe>
+</body>
+</html>
